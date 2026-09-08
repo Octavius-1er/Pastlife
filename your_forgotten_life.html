@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Forgotten Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #170d0f;
+    --bg2: #2b1319;
+    --brass: #b5652c;
+    --brass-soft: #d98f4f;
+    --card-back: #3a141f;
+    --card-back2: #4a1b28;
+    --card-face: #f1e3c4;
+    --ink: #2a1712;
+    --text: #f0e6df;
+    --muted: #b7938c;
+    --font-display: 'Fraunces', serif;
+    --font-ui: 'Karla', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, var(--bg2), var(--bg) 65%);
+    background-color:var(--bg);
+    color:var(--text);
+    font-family:var(--font-ui);
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 80px;
+  }
+  .stage{width:100%;max-width:520px;}
+  h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:2.1rem;
+    margin:0 0 8px;
+    color:var(--brass-soft);
+    text-align:center;
+  }
+  .lead{
+    font-size:.98rem;
+    line-height:1.55;
+    color:var(--muted);
+    text-align:center;
+    max-width:40ch;
+    margin:0 auto 26px;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* --- scan frame --- */
+  .scan-frame{
+    position:relative;
+    width:200px;height:200px;
+    margin:6px auto 20px;
+  }
+  .scan-frame video{
+    width:100%;height:100%;
+    object-fit:cover;
+    border-radius:50%;
+    display:block;
+    background:#0e0708;
+    transform:scaleX(-1);
+  }
+  .scan-frame canvas{
+    position:absolute;top:0;left:0;
+    width:100%;height:100%;
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .ring{
+    position:absolute;inset:-7px;
+    border-radius:50%;
+    border:1px solid var(--brass);
+    box-shadow:0 0 26px rgba(181,101,44,.25);
+    pointer-events:none;
+  }
+  .no-camera .scan-frame{
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    border:1px dashed rgba(181,101,44,.5);
+    color:var(--muted);
+    font-size:.82rem;
+    text-align:center;
+    padding:18px;
+  }
+  .privacy-note{
+    text-align:center;
+    font-size:.78rem;
+    color:var(--muted);
+    max-width:36ch;
+    margin:0 auto 22px;
+    line-height:1.4;
+  }
+  .btn-brass{
+    display:block;margin:0 auto;
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:.92rem;
+    background:linear-gradient(180deg, var(--brass-soft), var(--brass));
+    color:#1e0f08;
+    border:none;
+    padding:12px 24px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .btn-brass:hover{transform:translateY(-1px);}
+
+  /* --- scanning readout --- */
+  .readout{
+    font-family:var(--font-ui);
+    font-size:.85rem;
+    color:var(--brass-soft);
+    max-width:320px;
+    margin:0 auto;
+    min-height:120px;
+    text-align:center;
+  }
+  .readout div{
+    opacity:0;
+    animation:lineIn .4s ease forwards;
+    margin-bottom:8px;
+  }
+  @keyframes lineIn{to{opacity:1;}}
+
+  /* --- deck --- */
+  .deck-hint{
+    text-align:center;
+    font-size:.85rem;
+    color:var(--muted);
+    margin-bottom:22px;
+  }
+  .card{
+    perspective:1200px;
+    margin-bottom:16px;
+  }
+  .card-inner{
+    position:relative;
+    min-height:118px;
+    transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.4,.2,.2,1);
+  }
+  .card.flipped .card-inner{transform:rotateY(180deg);}
+  .card-face{
+    position:absolute;inset:0;
+    backface-visibility:hidden;
+    border-radius:12px;
+    padding:18px 20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .card-front{
+    background:linear-gradient(160deg, var(--card-back2), var(--card-back));
+    border:1px solid rgba(181,101,44,.4);
+    cursor:pointer;
+    align-items:center;
+    text-align:center;
+    opacity:.55;
+    filter:saturate(.7);
+    transition:opacity .3s, filter .3s, box-shadow .3s;
+  }
+  .card.active .card-front{
+    opacity:1;
+    filter:none;
+    box-shadow:0 0 0 1px rgba(181,101,44,.5), 0 8px 24px rgba(181,101,44,.15);
+  }
+  .card-number{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:1.6rem;
+    color:var(--brass-soft);
+    margin-bottom:4px;
+  }
+  .card-label{
+    font-size:.78rem;
+    color:var(--muted);
+    letter-spacing:.02em;
+  }
+  .card.active .card-label{color:var(--text);}
+  .card-back{
+    background:var(--card-face);
+    color:var(--ink);
+    transform:rotateY(180deg);
+    position:relative;
+    align-items:center;
+    text-align:center;
+  }
+  .card-back .cat{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#8a5326;
+    margin:0 0 6px;
+  }
+  .card-back .emoji{
+    font-size:1.7rem;
+    margin-bottom:4px;
+  }
+  .card-back .val{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:1.12rem;
+    line-height:1.3;
+    margin:0;
+  }
+  .card-back .line{
+    font-family:var(--font-ui);
+    font-size:.78rem;
+    color:#6b4a2e;
+    margin:6px 0 0;
+    line-height:1.35;
+  }
+
+  .final-card{
+    background:linear-gradient(160deg, rgba(241,227,196,.08), rgba(241,227,196,.03));
+    border:1px solid rgba(181,101,44,.35);
+    border-radius:14px;
+    padding:22px 20px;
+    margin-top:10px;
+  }
+  .final-card h2{
+    font-family:var(--font-display);
+    font-weight:600;
+    color:var(--brass-soft);
+    margin:0 0 16px;
+    font-size:1.4rem;
+    text-align:center;
+  }
+  .recap-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid rgba(181,101,44,.18);
+  }
+  .recap-row:last-of-type{border-bottom:none;}
+  .recap-emoji{font-size:1.3rem;line-height:1.4;}
+  .recap-label{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:.66rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--brass-soft);
+    margin-bottom:2px;
+  }
+  .recap-val{
+    font-family:var(--font-display);
+    font-size:1rem;
+    color:var(--card-face);
+    line-height:1.3;
+  }
+  .recap-line{
+    font-size:.78rem;
+    color:var(--muted);
+    margin-top:2px;
+    line-height:1.35;
+  }
+  .final-actions{display:flex;justify-content:center;margin-top:20px;}
+  @media (prefers-reduced-motion: reduce){
+    .card-inner{transition:none;}
+    .readout div{animation:none;opacity:1;}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- SCREEN 1 : intro + camera -->
+  <section id="screen-intro" class="screen active">
+    <h1>Your Forgotten Life</h1>
+    <p class="lead">Draw eight cards to uncover who you were in another life — your name, your fortune, your gift, and more.</p>
+    <div class="scan-frame" id="scanFrame">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay" width="200" height="200"></canvas>
+      <div class="ring"></div>
+    </div>
+    <p class="privacy-note">🔒 The camera feed stays in your browser — it's never saved or sent anywhere. It's only used to seed the draw.</p>
+    <button class="btn-brass" id="btnStart">Start the reading</button>
+  </section>
+
+  <!-- SCREEN 2 : scanning -->
+  <section id="screen-scan" class="screen">
+    <h1 style="font-size:1.5rem;">Preparing your reading…</h1>
+    <div class="readout" id="readout"></div>
+  </section>
+
+  <!-- SCREEN 3 : deck -->
+  <section id="screen-deck" class="screen">
+    <h1 style="font-size:1.6rem;">Flip the cards</h1>
+    <p class="deck-hint">One card at a time — in order.</p>
+    <div id="deckList"></div>
+    <div id="finalWrap"></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── Short "highlight + line" banks ── */
+
+  const firstNames = ["Eleanor","Thomas","Margarethe","Silas","Ines","Frederick","Odile","Bartholomew","Wren","Ambrose","Josephine","Callum","Iris","Reuben","Marguerite","Elias"];
+  const lastNames  = ["Whitlock","Marsh","Ashworth","Kellerman","Fontaine","Blackwood","Sorrel","Duvall","Winters","Hargrove","Delacroix","Thistlewood","Rourke","Vance","Beaumont","Ferro"];
+  const nameLines  = [
+    "Never went by anything shorter.",
+    "Signed every letter with just the initials.",
+    "Hated the name, kept it anyway.",
+    "Named after a grandparent no one liked.",
+    "The name everyone mispronounced.",
+    "Chosen by a coin flip, according to family legend.",
+    "Sounded grander than the life that came with it.",
+    "The only one in the family who spelled it that way."
+  ];
+
+  const wealth = [
+    {emoji:"😬", val:"Barely scraping by", line:"Bread was a luxury some months."},
+    {emoji:"🙂", val:"Comfortably stable", line:"Never rich, never worried."},
+    {emoji:"📉", val:"Lost it all overnight", line:"Gone in a single bad winter."},
+    {emoji:"🪙", val:"A hidden small fortune", line:"Never found after death."},
+    {emoji:"💳", val:"Buried in debt", line:"Still lent money to others."},
+    {emoji:"🌾", val:"Tied to the harvest", line:"Good years, bad years, no complaints."},
+    {emoji:"💰", val:"One of the wealthiest around", line:"Lived like a pauper anyway."},
+    {emoji:"🎁", val:"Gave it all away", line:"Down to the last coin, for a cause."}
+  ];
+
+  const children = [
+    {emoji:"🚫", val:"No children", line:"Raised nieces and nephews instead."},
+    {emoji:"👶", val:"1 child", line:"The center of the whole household."},
+    {emoji:"👧👦", val:"2 children", line:"Inseparable, then estranged, then close again."},
+    {emoji:"👨‍👩‍👧‍👦", val:"4 children", line:"Only three survived past ten."},
+    {emoji:"👨‍👩‍👧‍👦", val:"6 children", line:"The house was never quiet."},
+    {emoji:"🧒", val:"1 adopted child", line:"Never treated any differently."},
+    {emoji:"👶👶", val:"Twins", line:"Impossible to tell apart until age seven."},
+    {emoji:"❓", val:"A child no one spoke of", line:"Given away young, quietly."}
+  ];
+
+  const gifts = [
+    {emoji:"🧠", val:"Freakishly intelligent", line:"Solved problems no one else could."},
+    {emoji:"🌩️", val:"Could read a storm coming", line:"Two days before it arrived."},
+    {emoji:"🐾", val:"Calmed any animal instantly", line:"Even ones that bit everyone else."},
+    {emoji:"🎵", val:"Perfect pitch", line:"Could tune an instrument by ear alone."},
+    {emoji:"💧", val:"Always found water", line:"Even in the driest ground."},
+    {emoji:"🧩", val:"Photographic memory", line:"Never forgot a face or a debt."},
+    {emoji:"🗣️", val:"A born persuader", line:"Talked their way out of anything."},
+    {emoji:"🔧", val:"Could fix almost anything", line:"With string, patience, and nothing else."},
+    {emoji:"👁️", val:"Uncanny intuition", line:"Knew who to trust before anyone said a word."}
+  ];
+
+  /* Jobs are picked based on birth era so they stay common and plausible for the time */
+  const jobsByEra = {
+    // born 1710–1799: mostly agrarian, artisan and trade work
+    farmEra: [
+      {emoji:"🌾", val:"Farmer", line:"Up with the sun, every season."},
+      {emoji:"🔨", val:"Blacksmith", line:"Never once ruined a blade."},
+      {emoji:"🐑", val:"Shepherd", line:"Knew every animal in the flock by sight."},
+      {emoji:"🧵", val:"Weaver", line:"Fabric sold as far as the next county."},
+      {emoji:"🪚", val:"Carpenter", line:"Built half the furniture in the village."},
+      {emoji:"🥖", val:"Baker", line:"Up before dawn, every single day."},
+      {emoji:"🧺", val:"Seamstress", line:"Could mend anything by candlelight."},
+      {emoji:"🐟", val:"Fisherman", line:"Out on the water before anyone else woke."},
+      {emoji:"🧱", val:"Mason", line:"Half the walls in town were his work."},
+      {emoji:"🍺", val:"Innkeeper", line:"Heard every piece of gossip in town first."},
+      {emoji:"🩹", val:"Midwife", line:"Called out in the middle of the night, always."},
+      {emoji:"🐴", val:"Stableman", line:"Trusted more animals than people."}
+    ],
+    // born 1800–1899: industrial era, trade and early service jobs
+    industrialEra: [
+      {emoji:"🏭", val:"Factory worker", line:"Same shift, same bench, for decades."},
+      {emoji:"⛏️", val:"Coal miner", line:"Never quite got the dust out of his lungs."},
+      {emoji:"🚂", val:"Railway worker", line:"Knew the timetable better than his own schedule."},
+      {emoji:"🛒", val:"Shopkeeper", line:"Kept the books in his head, never on paper."},
+      {emoji:"🧵", val:"Dressmaker", line:"Every bride in town wore her work once."},
+      {emoji:"✉️", val:"Postman", line:"Walked the same route in every kind of weather."},
+      {emoji:"📚", val:"Village teacher", line:"The only one in town who could read Latin."},
+      {emoji:"🖋️", val:"Clerk", line:"Handwriting neater than anyone else's in the office."},
+      {emoji:"🍞", val:"Baker", line:"Up before dawn, every single day."},
+      {emoji:"⚓", val:"Sailor", line:"Home for a few weeks a year, at best."},
+      {emoji:"🔨", val:"Blacksmith", line:"Never once ruined a blade."},
+      {emoji:"🍺", val:"Innkeeper", line:"Heard every piece of gossip in town first."}
+    ],
+    // born 1900–1965: more modern, common 20th-century jobs
+    modernEra: [
+      {emoji:"🏭", val:"Factory worker", line:"Same shift, same bench, for decades."},
+      {emoji:"🚚", val:"Truck driver", line:"Knew every backroad for a hundred miles."},
+      {emoji:"🩺", val:"Nurse", line:"Never once complained about a night shift."},
+      {emoji:"🧑‍🏫", val:"Schoolteacher", line:"Half the town called her 'teacher' for life."},
+      {emoji:"🔧", val:"Mechanic", line:"Could diagnose an engine by ear alone."},
+      {emoji:"🖋️", val:"Office clerk", line:"Same desk for thirty years, never once late."},
+      {emoji:"🛒", val:"Shopkeeper", line:"Knew every regular customer by name."},
+      {emoji:"👷", val:"Construction worker", line:"Helped build half the street he lived on."},
+      {emoji:"✉️", val:"Postal worker", line:"Walked the same route in every kind of weather."},
+      {emoji:"💇", val:"Hairdresser", line:"Knew more town secrets than the newspaper."},
+      {emoji:"🚒", val:"Firefighter", line:"Never talked much about the bad days."},
+      {emoji:"🌾", val:"Farmer", line:"Up with the sun, every season."}
+    ]
+  };
+
+  const animals = [
+    {emoji:"🐈‍⬛", val:"A one-eyed cat", line:"Showed up one winter, never left."},
+    {emoji:"🐎", val:"A stubborn old horse", line:"Refused to move for anyone else."},
+    {emoji:"🐦", val:"A talking crow", line:"Repeated things it really shouldn't have."},
+    {emoji:"🐐", val:"A goat that ate everything", line:"Including the mail, twice."},
+    {emoji:"🐕", val:"A loyal three-legged dog", line:"Never more than a few feet away."},
+    {emoji:"🦆", val:"A duck that followed like a dog", line:"No one could explain why."},
+    {emoji:"🐀", val:"A tame rat", line:"Lived in a coat pocket, mostly."},
+    {emoji:"🐖", val:"A pig raised as a pet", line:"Never made it to the table."}
+  ];
+
+  const homes = [
+    {emoji:"🏚️", val:"A one-room cottage", line:"Shared with three generations at once."},
+    {emoji:"🏰", val:"A crumbling old estate", line:"Too big to heat, too proud to sell."},
+    {emoji:"⛵", val:"A houseboat", line:"Never quite moored in one place."},
+    {emoji:"🌾", val:"A farmhouse at the edge of town", line:"Closest neighbor was a mile off."},
+    {emoji:"🏘️", val:"A small house in the city center", line:"Thin walls, loud neighbors."},
+    {emoji:"⛰️", val:"A cabin up the mountain", line:"Snowed in most winters."},
+    {emoji:"🏭", val:"Rooms above the workshop", line:"Fell asleep to the sound of tools."},
+    {emoji:"🌊", val:"A cottage by the sea", line:"Salt in everything, always."}
+  ];
+
+  const causesByBand = {
+    0: ["a childhood fever", "an outbreak that swept the town", "an accidental fall"],
+    1: ["drowning", "a cart accident", "a sudden fever", "a battle"],
+    2: ["a cholera outbreak", "a duel", "a difficult childbirth", "a fall from a roof"],
+    3: ["a chest illness", "a failing heart", "a long fever", "a harsh winter"],
+    4: ["old age, simply", "passing in their sleep", "a long illness", "one last winter"]
+  };
+  const ageBands = [
+    { min: 1,  max: 12, weight: 8,  band: 0 },
+    { min: 13, max: 30, weight: 14, band: 1 },
+    { min: 31, max: 50, weight: 22, band: 2 },
+    { min: 51, max: 70, weight: 28, band: 3 },
+    { min: 71, max: 95, weight: 28, band: 4 }
+  ];
+
+  const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const nationalities = [
+    {emoji:"🇫🇷", val:"French", line:"Carried it everywhere, quietly proud."},
+    {emoji:"🇬🇧", val:"British", line:"Never once dropped the accent."},
+    {emoji:"🇮🇪", val:"Irish", line:"Kept the old songs alive."},
+    {emoji:"🇮🇹", val:"Italian", line:"Cooking gave it away before he said a word."},
+    {emoji:"🇩🇪", val:"German", line:"Almost forgotten by the family, decades later."},
+    {emoji:"🇪🇸", val:"Spanish", line:"Passed down more in habits than in words."},
+    {emoji:"🇵🇱", val:"Polish", line:"The name always gave it away."},
+    {emoji:"🇳🇱", val:"Dutch", line:"Rarely mentioned it, but never denied it."},
+    {emoji:"🇸🇪", val:"Swedish", line:"Only came up around the holidays."},
+    {emoji:"🇳🇴", val:"Norwegian", line:"A grandmother's stories were the only proof."},
+    {emoji:"🇷🇺", val:"Russian", line:"A single old photograph was all that remained of it."},
+    {emoji:"🇵🇹", val:"Portuguese", line:"Showed up mostly in the family recipes."},
+    {emoji:"🏴", val:"Scottish", line:"Brought up at every family gathering."},
+    {emoji:"🇬🇷", val:"Greek", line:"Worn like a badge, never explained."},
+    {emoji:"🇺🇸", val:"American", line:"Assumed, until someone asked directly."},
+    {emoji:"🇨🇦", val:"Canadian", line:"Mentioned only when it was useful."},
+    {emoji:"🇭🇺", val:"Hungarian", line:"Nearly lost, then found again in old letters."},
+    {emoji:"🇦🇹", val:"Austrian", line:"Confirmed by a single old passport."}
+  ];
+
+  const deckOrder = [
+    { key:"name",        label:"Name" },
+    { key:"nationality", label:"Nationality" },
+    { key:"birth",       label:"Birth & Death" },
+    { key:"wealth",      label:"Wealth" },
+    { key:"children",    label:"Children" },
+    { key:"gift",        label:"Gift" },
+    { key:"job",         label:"Job" },
+    { key:"animal",      label:"Animal" },
+    { key:"home",        label:"Home" }
+  ];
+
+  const scanLinesText = [
+    "Scanning contours…",
+    "Reading ambient light…",
+    "(for folklore, not for science)",
+    "Drawing the cards…",
+    "Eight cards laid on the table."
+  ];
+
+  let stream = null;
+  let results = null;
+  let currentCard = 0;
+
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function pick(rng, bank){ return bank[Math.floor(rng() * bank.length)]; }
+  function randInt(rng, min, max){ return min + Math.floor(rng() * (max - min + 1)); }
+
+  function pickAgeBand(rng){
+    const total = ageBands.reduce((s,b) => s + b.weight, 0);
+    let r = rng() * total;
+    for(const band of ageBands){
+      if(r < band.weight) return band;
+      r -= band.weight;
+    }
+    return ageBands[ageBands.length - 1];
+  }
+
+  function buildResults(rng){
+    const name = {
+      emoji: "🪶",
+      val: `${pick(rng, firstNames)} ${pick(rng, lastNames)}`,
+      line: pick(rng, nameLines)
+    };
+
+    const birthYear = randInt(rng, 1710, 1965);
+    const birthMonth = randInt(rng, 0, 11);
+    const birthDay = randInt(rng, 1, 28);
+
+    const band = pickAgeBand(rng);
+    const age = randInt(rng, band.min, band.max);
+    const deathYear = birthYear + age;
+    const deathMonth = randInt(rng, 0, 11);
+    const deathDay = randInt(rng, 1, 28);
+    const cause = pick(rng, causesByBand[band.band]);
+
+    const birth = {
+      emoji: "🕯️",
+      val: `${monthsEn[birthMonth]} ${birthDay}, ${birthYear} – ${monthsEn[deathMonth]} ${deathDay}, ${deathYear}`,
+      line: `Cause: ${cause} · Age ${age}`
+    };
+
+    // Job pool depends on the era the character was born into
+    let jobPool;
+    if(birthYear < 1800) jobPool = jobsByEra.farmEra;
+    else if(birthYear < 1900) jobPool = jobsByEra.industrialEra;
+    else jobPool = jobsByEra.modernEra;
+
+    return {
+      name,
+      nationality: pick(rng, nationalities),
+      birth,
+      wealth: pick(rng, wealth),
+      children: pick(rng, children),
+      gift: pick(rng, gifts),
+      job: pick(rng, jobPool),
+      animal: pick(rng, animals),
+      home: pick(rng, homes)
+    };
+  }
+
+  const screenIntro = document.getElementById('screen-intro');
+  const screenScan = document.getElementById('screen-scan');
+  const screenDeck = document.getElementById('screen-deck');
+  const video = document.getElementById('video');
+  const overlay = document.getElementById('overlay');
+  const octx = overlay.getContext('2d');
+  const readout = document.getElementById('readout');
+  const btnStart = document.getElementById('btnStart');
+  const deckList = document.getElementById('deckList');
+  const finalWrap = document.getElementById('finalWrap');
+  const scanFrame = document.getElementById('scanFrame');
+
+  function showScreen(el){
+    [screenIntro, screenScan, screenDeck].forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  async function initCamera(){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+      video.srcObject = stream;
+    }catch(e){
+      document.body.classList.add('no-camera');
+      scanFrame.innerHTML = "Camera unavailable.<br>Drawing at random instead.";
+    }
+  }
+  initCamera();
+
+  function stopCamera(){
+    if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+  }
+
+  let scanRAF = null;
+  function drawOverlayFrame(t){
+    octx.clearRect(0,0,200,200);
+    const cx=100, cy=100, r=90;
+    const sweepY = 15 + (Math.sin(t/480)*.5+.5) * 170;
+    octx.strokeStyle = "rgba(217,143,79,.6)";
+    octx.lineWidth = 1.5;
+    octx.beginPath(); octx.moveTo(8,sweepY); octx.lineTo(192,sweepY); octx.stroke();
+    const rng = mulberry32(Math.floor(t/300));
+    for(let i=0;i<5;i++){
+      const a = rng()*Math.PI*2, rad = rng()*r*0.8;
+      octx.fillStyle = "rgba(181,101,44,.85)";
+      octx.beginPath();
+      octx.arc(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad, 2, 0, Math.PI*2);
+      octx.fill();
+    }
+    scanRAF = requestAnimationFrame(drawOverlayFrame);
+  }
+
+  function sampleSeedFromVideo(){
+    try{
+      const c = document.createElement('canvas');
+      c.width = 12; c.height = 12;
+      const cctx = c.getContext('2d');
+      cctx.drawImage(video, 0, 0, 12, 12);
+      const data = cctx.getImageData(0,0,12,12).data;
+      let sum = 0;
+      for(let i=0;i<data.length;i+=4){ sum += data[i]+data[i+1]+data[i+2]; }
+      return sum >>> 0;
+    }catch(e){ return Math.floor(Math.random()*1e9); }
+  }
+
+  function runScanSequence(){
+    showScreen(screenScan);
+    readout.innerHTML = "";
+    if(stream){ scanRAF = requestAnimationFrame(drawOverlayFrame); }
+    screenScan.insertBefore(scanFrame, readout);
+
+    scanLinesText.forEach((line, idx) => {
+      setTimeout(() => {
+        const d = document.createElement('div');
+        d.textContent = "> " + line;
+        readout.appendChild(d);
+      }, idx * 460);
+    });
+
+    setTimeout(() => {
+      if(scanRAF) cancelAnimationFrame(scanRAF);
+      const px = stream ? sampleSeedFromVideo() : Math.floor(Math.random()*1e9);
+      stopCamera();
+      const rng = mulberry32((px ^ Date.now()) >>> 0);
+      results = buildResults(rng);
+      buildDeck();
+      showScreen(screenDeck);
+    }, scanLinesText.length * 460 + 500);
+  }
+
+  btnStart.addEventListener('click', runScanSequence);
+
+  function buildDeck(){
+    deckList.innerHTML = "";
+    finalWrap.innerHTML = "";
+    currentCard = 0;
+
+    deckOrder.forEach((def, idx) => {
+      const item = results[def.key];
+
+      const card = document.createElement('div');
+      card.className = "card" + (idx === 0 ? " active" : "");
+      card.id = "card-" + idx;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-number">${toRoman(idx+1)}</div>
+            <div class="card-label">${def.label}</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="cat">${def.label}</div>
+            <div class="emoji">${item.emoji}</div>
+            <p class="val">${item.val}</p>
+            <p class="line">${item.line}</p>
+          </div>
+        </div>
+      `;
+      const front = card.querySelector('.card-front');
+      front.addEventListener('click', () => {
+        if(idx !== currentCard) return;
+        card.classList.add('flipped');
+        currentCard++;
+        const next = document.getElementById('card-' + currentCard);
+        if(next){ next.classList.add('active'); }
+        else { showFinal(); }
+      });
+      deckList.appendChild(card);
+    });
+  }
+
+  function toRoman(n){
+    const table = ["I","II","III","IV","V","VI","VII","VIII","IX"];
+    return table[n-1] || n;
+  }
+
+  function showFinal(){
+    const rows = deckOrder.map(def => {
+      const item = results[def.key];
+      return `
+        <div class="recap-row">
+          <div class="recap-emoji">${item.emoji}</div>
+          <div>
+            <div class="recap-label">${def.label}</div>
+            <div class="recap-val">${item.val}</div>
+            <div class="recap-line">${item.line}</div>
+          </div>
+        </div>`;
+    }).join("");
+
+    finalWrap.innerHTML = `
+      <div class="final-card">
+        <h2>Your life, at a glance</h2>
+        ${rows}
+        <div class="final-actions">
+          <button class="btn-brass" id="btnRestart">Draw again</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('btnRestart').addEventListener('click', () => {
+      showScreen(screenIntro);
+      screenIntro.insertBefore(scanFrame, document.querySelector('#screen-intro .privacy-note'));
+      initCamera();
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
