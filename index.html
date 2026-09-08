@@ -312,8 +312,8 @@
 
   /* ── Short "highlight + line" banks ── */
 
-  const firstNames = ["Eleanor","Thomas","Margarethe","Silas","Ines","Frederick","Odile","Bartholomew","Wren","Ambrose","Josephine","Callum","Iris","Reuben","Marguerite","Elias"];
-  const lastNames  = ["Whitlock","Marsh","Ashworth","Kellerman","Fontaine","Blackwood","Sorrel","Duvall","Winters","Hargrove","Delacroix","Thistlewood","Rourke","Vance","Beaumont","Ferro"];
+  const firstNames = ["James","Michael","David","John","Robert","William","Daniel","Matthew","Christopher","Andrew","Joseph","Ryan","Kevin","Brian","Thomas","Emma","Olivia","Sarah","Jessica","Ashley","Amanda","Jennifer","Elizabeth","Michelle","Lisa","Laura","Rachel","Amy","Nicole","Samantha"];
+  const lastNames  = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez","Wilson","Anderson","Taylor","Thomas","Moore","Jackson","Martin","Lee","Perez","Thompson","White","Harris","Clark","Lewis","Walker"];
   const nameLines  = [
     "Never went by anything shorter.",
     "Signed every letter with just the initials.",
@@ -361,50 +361,50 @@
 
   /* Jobs are picked based on birth era so they stay common and plausible for the time */
   const jobsByEra = {
-    // born 1710–1799: mostly agrarian, artisan and trade work
-    farmEra: [
-      {emoji:"🌾", val:"Farmer", line:"Up with the sun, every season."},
-      {emoji:"🔨", val:"Blacksmith", line:"Never once ruined a blade."},
-      {emoji:"🐑", val:"Shepherd", line:"Knew every animal in the flock by sight."},
-      {emoji:"🧵", val:"Weaver", line:"Fabric sold as far as the next county."},
-      {emoji:"🪚", val:"Carpenter", line:"Built half the furniture in the village."},
-      {emoji:"🥖", val:"Baker", line:"Up before dawn, every single day."},
-      {emoji:"🧺", val:"Seamstress", line:"Could mend anything by candlelight."},
-      {emoji:"🐟", val:"Fisherman", line:"Out on the water before anyone else woke."},
-      {emoji:"🧱", val:"Mason", line:"Half the walls in town were his work."},
-      {emoji:"🍺", val:"Innkeeper", line:"Heard every piece of gossip in town first."},
-      {emoji:"🩹", val:"Midwife", line:"Called out in the middle of the night, always."},
-      {emoji:"🐴", val:"Stableman", line:"Trusted more animals than people."}
-    ],
-    // born 1800–1899: industrial era, trade and early service jobs
-    industrialEra: [
+    // born 1930–1959: post-war, industrial, early modern jobs
+    vintageEra: [
       {emoji:"🏭", val:"Factory worker", line:"Same shift, same bench, for decades."},
-      {emoji:"⛏️", val:"Coal miner", line:"Never quite got the dust out of his lungs."},
-      {emoji:"🚂", val:"Railway worker", line:"Knew the timetable better than his own schedule."},
-      {emoji:"🛒", val:"Shopkeeper", line:"Kept the books in his head, never on paper."},
-      {emoji:"🧵", val:"Dressmaker", line:"Every bride in town wore her work once."},
-      {emoji:"✉️", val:"Postman", line:"Walked the same route in every kind of weather."},
-      {emoji:"📚", val:"Village teacher", line:"The only one in town who could read Latin."},
-      {emoji:"🖋️", val:"Clerk", line:"Handwriting neater than anyone else's in the office."},
-      {emoji:"🍞", val:"Baker", line:"Up before dawn, every single day."},
-      {emoji:"⚓", val:"Sailor", line:"Home for a few weeks a year, at best."},
-      {emoji:"🔨", val:"Blacksmith", line:"Never once ruined a blade."},
-      {emoji:"🍺", val:"Innkeeper", line:"Heard every piece of gossip in town first."}
-    ],
-    // born 1900–1965: more modern, common 20th-century jobs
-    modernEra: [
-      {emoji:"🏭", val:"Factory worker", line:"Same shift, same bench, for decades."},
-      {emoji:"🚚", val:"Truck driver", line:"Knew every backroad for a hundred miles."},
-      {emoji:"🩺", val:"Nurse", line:"Never once complained about a night shift."},
-      {emoji:"🧑‍🏫", val:"Schoolteacher", line:"Half the town called her 'teacher' for life."},
+      {emoji:"🧵", val:"Seamstress", line:"Could mend anything without looking."},
+      {emoji:"🚜", val:"Farmer", line:"Up with the sun, every season."},
       {emoji:"🔧", val:"Mechanic", line:"Could diagnose an engine by ear alone."},
-      {emoji:"🖋️", val:"Office clerk", line:"Same desk for thirty years, never once late."},
+      {emoji:"🧑‍🏫", val:"Schoolteacher", line:"Half the town called her 'teacher' for life."},
       {emoji:"🛒", val:"Shopkeeper", line:"Knew every regular customer by name."},
-      {emoji:"👷", val:"Construction worker", line:"Helped build half the street he lived on."},
+      {emoji:"🥛", val:"Milkman", line:"Same route, before sunrise, for years."},
       {emoji:"✉️", val:"Postal worker", line:"Walked the same route in every kind of weather."},
+      {emoji:"🖋️", val:"Office clerk", line:"Same desk for thirty years, never once late."},
+      {emoji:"🚒", val:"Firefighter", line:"Never talked much about the bad days."},
+      {emoji:"🩺", val:"Nurse", line:"Never once complained about a night shift."},
+      {emoji:"👷", val:"Construction worker", line:"Helped build half the street he lived on."}
+    ],
+    // born 1960–1989: office jobs, trades, early tech
+    midEra: [
+      {emoji:"🖋️", val:"Office worker", line:"Same desk for thirty years, never once late."},
+      {emoji:"🩺", val:"Nurse", line:"Never once complained about a night shift."},
+      {emoji:"🔧", val:"Mechanic", line:"Could diagnose an engine by ear alone."},
+      {emoji:"🧑‍🏫", val:"Teacher", line:"Half the town called her 'teacher' for life."},
+      {emoji:"🚚", val:"Truck driver", line:"Knew every backroad for a hundred miles."},
+      {emoji:"🛒", val:"Shop owner", line:"Knew every regular customer by name."},
+      {emoji:"🏗️", val:"Engineer", line:"Kept a notebook full of half-finished ideas."},
       {emoji:"💇", val:"Hairdresser", line:"Knew more town secrets than the newspaper."},
       {emoji:"🚒", val:"Firefighter", line:"Never talked much about the bad days."},
-      {emoji:"🌾", val:"Farmer", line:"Up with the sun, every season."}
+      {emoji:"📞", val:"Sales rep", line:"Could sell almost anything to anyone."},
+      {emoji:"🏭", val:"Factory worker", line:"Same shift, same bench, for decades."},
+      {emoji:"👮", val:"Police officer", line:"Knew everyone in the neighborhood by name."}
+    ],
+    // born 1990–2015: contemporary, common modern jobs
+    modernEra: [
+      {emoji:"💻", val:"Software developer", line:"Fixed one bug, created three more."},
+      {emoji:"☕", val:"Barista", line:"Knew everyone's order by the second visit."},
+      {emoji:"🩺", val:"Nurse", line:"Never once complained about a night shift."},
+      {emoji:"🧑‍🏫", val:"Teacher", line:"Graded papers most weekends, unpaid."},
+      {emoji:"📦", val:"Delivery driver", line:"Knew every apartment buzzer code in town."},
+      {emoji:"🎨", val:"Graphic designer", line:"Redid the same logo eleven times."},
+      {emoji:"🔧", val:"Electrician", line:"Booked out weeks in advance."},
+      {emoji:"🛒", val:"Retail worker", line:"Knew the return policy better than management."},
+      {emoji:"🏋️", val:"Personal trainer", line:"Believed in everyone but himself, some days."},
+      {emoji:"📱", val:"Social media manager", line:"Never fully logged off, even on vacation."},
+      {emoji:"🚑", val:"Paramedic", line:"Never talked much about the bad days."},
+      {emoji:"🍳", val:"Chef", line:"Burned the first pancake, every single time."}
     ]
   };
 
@@ -431,11 +431,11 @@
   ];
 
   const causesByBand = {
-    0: ["a childhood fever", "an outbreak that swept the town", "an accidental fall"],
-    1: ["drowning", "a cart accident", "a sudden fever", "a battle"],
-    2: ["a cholera outbreak", "a duel", "a difficult childbirth", "a fall from a roof"],
-    3: ["a chest illness", "a failing heart", "a long fever", "a harsh winter"],
-    4: ["old age, simply", "passing in their sleep", "a long illness", "one last winter"]
+    0: ["a childhood illness", "an accident", "a rare complication"],
+    1: ["a car accident", "a sudden illness", "an accident at work"],
+    2: ["a heart attack", "a long illness", "an accident"],
+    3: ["a long illness", "a stroke", "a heart condition"],
+    4: ["old age, simply", "passing in their sleep", "a long illness"]
   };
   const ageBands = [
     { min: 1,  max: 12, weight: 8,  band: 0 },
@@ -443,6 +443,15 @@
     { min: 31, max: 50, weight: 22, band: 2 },
     { min: 51, max: 70, weight: 28, band: 3 },
     { min: 71, max: 95, weight: 28, band: 4 }
+  ];
+
+  // Birth year bands: the more recent, the more common — the older, the rarer
+  const PRESENT_YEAR = 2025;
+  const birthYearBands = [
+    { min: 1993, max: 2012, weight: 42 }, // very common, recent
+    { min: 1975, max: 1992, weight: 30 }, // common
+    { min: 1955, max: 1974, weight: 18 }, // less common
+    { min: 1930, max: 1954, weight: 10 }  // rare, older
   ];
 
   const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -504,14 +513,18 @@
   function pick(rng, bank){ return bank[Math.floor(rng() * bank.length)]; }
   function randInt(rng, min, max){ return min + Math.floor(rng() * (max - min + 1)); }
 
-  function pickAgeBand(rng){
-    const total = ageBands.reduce((s,b) => s + b.weight, 0);
+  function pickWeighted(rng, bands){
+    const total = bands.reduce((s,b) => s + b.weight, 0);
     let r = rng() * total;
-    for(const band of ageBands){
+    for(const band of bands){
       if(r < band.weight) return band;
       r -= band.weight;
     }
-    return ageBands[ageBands.length - 1];
+    return bands[bands.length - 1];
+  }
+
+  function pickAgeBand(rng){
+    return pickWeighted(rng, ageBands);
   }
 
   function buildResults(rng){
@@ -521,12 +534,18 @@
       line: pick(rng, nameLines)
     };
 
-    const birthYear = randInt(rng, 1710, 1965);
+    const birthBand = pickWeighted(rng, birthYearBands);
+    const birthYear = randInt(rng, birthBand.min, birthBand.max);
     const birthMonth = randInt(rng, 0, 11);
     const birthDay = randInt(rng, 1, 28);
 
-    const band = pickAgeBand(rng);
-    const age = randInt(rng, band.min, band.max);
+    // age at death is capped so the death date never lands in the future
+    const maxAge = Math.max(1, PRESENT_YEAR - birthYear);
+    let band = pickAgeBand(rng);
+    let age = randInt(rng, band.min, Math.min(band.max, maxAge));
+    if(band.min > maxAge){
+      age = randInt(rng, 1, maxAge);
+    }
     const deathYear = birthYear + age;
     const deathMonth = randInt(rng, 0, 11);
     const deathDay = randInt(rng, 1, 28);
@@ -540,8 +559,8 @@
 
     // Job pool depends on the era the character was born into
     let jobPool;
-    if(birthYear < 1800) jobPool = jobsByEra.farmEra;
-    else if(birthYear < 1900) jobPool = jobsByEra.industrialEra;
+    if(birthYear < 1960) jobPool = jobsByEra.vintageEra;
+    else if(birthYear < 1990) jobPool = jobsByEra.midEra;
     else jobPool = jobsByEra.modernEra;
 
     return {
