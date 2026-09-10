@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>"/>
-<!-- Icône pour Apple (iOS) -->
-<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M90 2C40.5 2 0 42.5 0 90s40.5 88 90 88 90-40.5 90-88S139.5 2 90 2zm0 168c-40.5 0-75-34.5-75-75s34.5-75 75-75 75 34.5 75 75-34.5 75-75 75z'/><path fill='%23ffffff' d='M90 30c-25 0-45 20-45 45s20 45 45 45 45-20 45-45-20-45-45-45zm0 75c-13.8 0-25-11.2-25-25s11.2-25 25-25 25 11.2 25 25-11.2 25-25 25z'/></svg>"/>
-<!-- Icône pour Samsung (Android) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M96 2C43.1 2 0 45.1 0 96s43.1 94 96 94 96-43.1 96-94S148.9 2 96 2zm0 172c-40.5 0-74-33.5-74-74s33.5-74 74-74 74 33.5 74 74-33.5 74-74 74z'/><path fill='%23ffffff' d='M96 32c-25 0-45 20-45 45s20 45 45 45 45-20 45-45-20-45-45-45zm0 78c-13.8 0-25-11.2-25-25s11.2-25 25-25 25 11.2 25 25-11.2 25-25 25z'/></svg>"/>
-<!-- Icône pour Windows (Pinned Site) -->
-<meta name="msapplication-TileImage" content="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M72 2C32.1 2 0 34.1 0 72s32.1 70 72 70 72-32.1 72-70S111.9 2 72 2zm0 132c-31.5 0-57-25.5-57-57s25.5-57 57-57 57 25.5 57 57-25.5 57-57 57z'/><path fill='%23ffffff' d='M72 24c-19.8 0-36 16.2-36 36s16.2 36 36 36 36-16.2 36-36-16.2-36-36-36zm0 54c-11 0-20-9-20-20s9-20 20-20 20 9 20 20-9 20-20 20z'/></svg>"/>
-<meta name="msapplication-TileColor" content="#4a6baf">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Icône SVG pour navigateurs modernes -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>"/>
+
+    <!-- Icône pour Apple (iOS) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M90 2C40.5 2 0 42.5 0 90s40.5 88 90 88 90-40.5 90-88S139.5 2 90 2zm0 168c-40.5 0-75-34.5-75-75s34.5-75 75-75 75 34.5 75 75-34.5 75-75 75z'/><path fill='%23ffffff' d='M90 30c-25 0-45 20-45 45s20 45 45 45 45-20 45-45-20-45-45-45zm0 75c-13.8 0-25-11.2-25-25s11.2-25 25-25 25 11.2 25 25-11.2 25-25 25z'/></svg>"/>
+
+    <!-- Icône pour Samsung (Android) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M96 2C43.1 2 0 45.1 0 96s43.1 94 96 94 96-43.1 96-94S148.9 2 96 2zm0 172c-40.5 0-75-34.5-75-75s34.5-75 75-75 75 34.5 75 75-34.5 75-75 75z'/><path fill='%23ffffff' d='M96 32c-25 0-45 20-45 45s20 45 45 45 45-20 45-45-20-45-45-45zm0 78c-13.8 0-25-11.2-25-25s11.2-25 25-25 25 11.2 25 25-11.2 25-25 25z'/></svg>"/>
+
+    <!-- Icône pour Windows (Pinned Site) -->
+    <meta name="msapplication-TileImage" content="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'><title>Pastlife Scanner</title><path fill='%234a6baf' d='M72 2C32.1 2 0 34.1 0 72s32.1 70 72 70 72-32.1 72-70S111.9 2 72 2zm0 132c-31.5 0-57-25.5-57-57s25.5-57 57-57 57 25.5 57 57-25.5 57-57 57z'/><path fill='%23ffffff' d='M72 24c-19.8 0-36 16.2-36 36s16.2 36 36 36 36-16.2 36-36-16.2-36-36-36zm0 54c-11 0-20-9-20-20s9-20 20-20 20 9 20 20-9 20-20 20z'/></svg>"/>
+    <meta name="msapplication-TileColor" content="#4a6baf">
 <title>Your Forgotten Life</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
