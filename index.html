@@ -114,6 +114,21 @@
   }
   .btn-brass:hover{transform:translateY(-1px);}
 
+  /* --- hidden secret button (double-click to guarantee a rare draw) --- */
+  .secret-clover{
+    position:fixed;
+    bottom:10px;
+    right:14px;
+    font-size:.85rem;
+    opacity:.12;
+    cursor:default;
+    user-select:none;
+    transition:opacity .3s;
+  }
+  .secret-clover.armed{
+    opacity:.6;
+  }
+
   /* --- scanning readout --- */
   .readout{
     font-family:var(--font-ui);
@@ -288,6 +303,7 @@
     </div>
     <p class="privacy-note">🔒 The camera feed stays in your browser — it's never saved or sent anywhere. It's only used to seed the draw.</p>
     <button class="btn-brass" id="btnStart">Start the reading</button>
+    <div class="secret-clover" id="secretClover">🍀</div>
   </section>
 
   <!-- SCREEN 2 : scanning -->
@@ -312,8 +328,27 @@
 
   /* ── Short "highlight + line" banks ── */
 
-  const firstNames = ["James","Michael","David","John","Robert","William","Daniel","Matthew","Christopher","Andrew","Joseph","Ryan","Kevin","Brian","Thomas","Emma","Olivia","Sarah","Jessica","Ashley","Amanda","Jennifer","Elizabeth","Michelle","Lisa","Laura","Rachel","Amy","Nicole","Samantha"];
-  const lastNames  = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez","Wilson","Anderson","Taylor","Thomas","Moore","Jackson","Martin","Lee","Perez","Thompson","White","Harris","Clark","Lewis","Walker"];
+  /* Names are matched to the nationality drawn, so they stay coherent */
+  const namesByNationality = {
+    French:     { first:["Jean","Pierre","Louis","François","Henri","Marguerite","Claire","Adèle","Sophie","Camille"], last:["Dubois","Lefevre","Moreau","Girard","Bernard","Rousseau","Fontaine","Lambert","Renard","Caron"] },
+    British:    { first:["James","William","Edward","Arthur","George","Margaret","Elizabeth","Alice","Emily","Charlotte"], last:["Smith","Taylor","Brown","Wilson","Clarke","Hughes","Turner","Baker","Bennett","Wright"] },
+    Irish:      { first:["Sean","Patrick","Liam","Declan","Aidan","Bridget","Maeve","Siobhan","Aoife","Niamh"], last:["Murphy","Kelly","O'Brien","Ryan","Walsh","Byrne","Doyle","Kennedy","Fitzgerald","Sullivan"] },
+    Italian:    { first:["Giovanni","Marco","Antonio","Luigi","Salvatore","Maria","Giulia","Francesca","Lucia","Rosa"], last:["Rossi","Russo","Ferrari","Esposito","Bianchi","Romano","Colombo","Ricci","Marino","Greco"] },
+    German:     { first:["Hans","Wilhelm","Friedrich","Otto","Karl","Greta","Ingrid","Ursula","Helga","Anna"], last:["Müller","Schmidt","Schneider","Fischer","Weber","Wagner","Becker","Hoffmann","Koch","Richter"] },
+    Spanish:    { first:["Juan","Carlos","Francisco","Manuel","José","Maria","Carmen","Isabel","Dolores","Pilar"], last:["Garcia","Martinez","Lopez","Sanchez","Perez","Gomez","Fernandez","Diaz","Ruiz","Torres"] },
+    Polish:     { first:["Jan","Stanislaw","Tadeusz","Wladyslaw","Kazimierz","Maria","Zofia","Halina","Krystyna","Janina"], last:["Nowak","Kowalski","Wisniewski","Wojcik","Kaminski","Lewandowski","Zielinski","Szymanski","Wozniak","Kozlowski"] },
+    Dutch:      { first:["Jan","Willem","Hendrik","Pieter","Cornelis","Maria","Anna","Johanna","Wilhelmina","Cornelia"], last:["de Jong","Jansen","de Vries","van den Berg","van Dijk","Bakker","Visser","Smit","Meijer","de Boer"] },
+    Swedish:    { first:["Erik","Lars","Anders","Karl","Nils","Karin","Anna","Kristina","Astrid","Ingrid"], last:["Andersson","Johansson","Karlsson","Nilsson","Eriksson","Larsson","Olsson","Persson","Svensson","Gustafsson"] },
+    Norwegian:  { first:["Ole","Lars","Nils","Erik","Anders","Ingrid","Anna","Kari","Astrid","Solveig"], last:["Hansen","Johansen","Olsen","Larsen","Andersen","Pedersen","Nilsen","Kristiansen","Jensen","Karlsen"] },
+    Russian:    { first:["Ivan","Dmitri","Nikolai","Sergei","Mikhail","Anna","Natalia","Olga","Yelena","Irina"], last:["Ivanov","Petrov","Smirnov","Kuznetsov","Popov","Sokolov","Volkov","Morozov","Novikov","Fedorov"] },
+    Portuguese: { first:["Joao","Manuel","Antonio","Jose","Francisco","Maria","Ana","Isabel","Teresa","Fernanda"], last:["Silva","Santos","Ferreira","Pereira","Oliveira","Costa","Rodrigues","Martins","Sousa","Fernandes"] },
+    Scottish:   { first:["Angus","Hamish","Fraser","Callum","Duncan","Isla","Fiona","Morag","Elspeth","Mairi"], last:["MacDonald","MacLeod","Campbell","Stewart","Fraser","Robertson","Ross","Wallace","Sinclair","Grant"] },
+    Greek:      { first:["Dimitrios","Georgios","Nikolaos","Ioannis","Konstantinos","Maria","Eleni","Katerina","Sofia","Anastasia"], last:["Papadopoulos","Papadakis","Nikolaou","Georgiou","Ioannou","Vasileiou","Antoniou","Konstantinou","Christodoulou","Angelopoulos"] },
+    American:   { first:["James","Michael","David","John","Robert","William","Emma","Olivia","Sarah","Jessica","Amanda","Jennifer"], last:["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Wilson","Anderson","Taylor","Moore"] },
+    Canadian:   { first:["William","Emma","Jacob","Olivia","Liam","Noah","Marie","Jean","Claire"], last:["Tremblay","Gagnon","Roy","Côté","Bouchard","Smith","Wilson","Campbell"] },
+    Hungarian:  { first:["Istvan","Laszlo","Janos","Sandor","Zoltan","Erzsebet","Maria","Ilona","Margit","Gyorgyi"], last:["Nagy","Kovacs","Toth","Szabo","Horvath","Varga","Kiss","Molnar","Nemeth","Farkas"] },
+    Austrian:   { first:["Franz","Josef","Karl","Anton","Rudolf","Maria","Elisabeth","Theresia","Hedwig","Gertrude"], last:["Gruber","Huber","Bauer","Wagner","Pichler","Steiner","Moser","Mayer","Hofer","Leitner"] }
+  };
   const nameLines  = [
     "Never went by anything shorter.",
     "Signed every letter with just the initials.",
@@ -431,27 +466,27 @@
   ];
 
   const causesByBand = {
-    0: ["a childhood illness", "an accident", "a rare complication"],
-    1: ["a car accident", "a sudden illness", "an accident at work"],
-    2: ["a heart attack", "a long illness", "an accident"],
-    3: ["a long illness", "a stroke", "a heart condition"],
-    4: ["old age, simply", "passing in their sleep", "a long illness"]
+    0: ["an accident, far too soon", "a sudden illness", "a rare stroke of bad luck"],
+    1: ["a long illness", "a heart condition", "an unexpected accident"],
+    2: ["old age, peacefully", "a long full life, surrounded by family", "a quiet passing in their sleep"],
+    3: ["old age, surrounded by loved ones", "a peaceful passing after a remarkably long life", "simply old age, in their sleep"]
   };
+  // Nobody dies as a child here — every life runs at least to adulthood
   const ageBands = [
-    { min: 1,  max: 12, weight: 8,  band: 0 },
-    { min: 13, max: 30, weight: 14, band: 1 },
-    { min: 31, max: 50, weight: 22, band: 2 },
-    { min: 51, max: 70, weight: 28, band: 3 },
-    { min: 71, max: 95, weight: 28, band: 4 }
+    { min: 18, max: 40, weight: 10, band: 0 },
+    { min: 41, max: 65, weight: 25, band: 1 },
+    { min: 66, max: 85, weight: 35, band: 2 },
+    { min: 86, max: 100, weight: 30, band: 3 }
   ];
 
   // Birth year bands: the more recent, the more common — the older, the rarer
+  // Capped at 2007 so everyone is at least 18 by the present year
   const PRESENT_YEAR = 2025;
   const birthYearBands = [
-    { min: 1993, max: 2012, weight: 42 }, // very common, recent
-    { min: 1975, max: 1992, weight: 30 }, // common
-    { min: 1955, max: 1974, weight: 18 }, // less common
-    { min: 1930, max: 1954, weight: 10 }  // rare, older
+    { min: 1985, max: 2007, weight: 42 }, // very common, recent
+    { min: 1965, max: 1984, weight: 30 }, // common
+    { min: 1945, max: 1964, weight: 18 }, // less common
+    { min: 1925, max: 1944, weight: 10 }  // rare, older
   ];
 
   const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -477,6 +512,101 @@
     {emoji:"🇦🇹", val:"Austrian", line:"Confirmed by a single old passport."}
   ];
 
+  // Rare draw: a small chance of landing on a real historical figure instead
+  const legendaryChance = 0.04; // about 1 in 25 readings
+  const legendaryFigures = [
+    { name:{emoji:"🪶", val:"Albert Einstein", line:"Yes — that Einstein. A rare draw."},
+      nationality:{emoji:"🇩🇪", val:"German", line:"Later became a Swiss and American citizen."},
+      birth:{emoji:"🕯️", val:"March 14, 1879 – April 18, 1955", line:"Cause: a ruptured aneurysm · Age 76"},
+      wealth:{emoji:"🙂", val:"Comfortably well-off", line:"A professor's salary, plus a Nobel Prize."},
+      children:{emoji:"👨‍👩‍👧‍👦", val:"3 children", line:"One daughter's fate remains a mystery to historians."},
+      gift:{emoji:"🧠", val:"Rewrote the laws of the universe", line:"Never did learn to drive a car."},
+      job:{emoji:"🔬", val:"Physicist", line:"Started out as a patent clerk."},
+      animal:{emoji:"🐈‍⬛", val:"A cat named Tiger", line:"Said to mope on rainy days."},
+      home:{emoji:"🏡", val:"A modest academic's house", line:"Walked to the office most mornings."} },
+    { name:{emoji:"🪶", val:"Isaac Newton", line:"The falling-apple story is probably exaggerated."},
+      nationality:{emoji:"🇬🇧", val:"English", line:"Never once left England."},
+      birth:{emoji:"🕯️", val:"January 4, 1643 – March 31, 1727", line:"Cause: old age · Age 84"},
+      wealth:{emoji:"💰", val:"Wealthy in his later years", line:"Ran the Royal Mint after his scientific career."},
+      children:{emoji:"🚫", val:"No children", line:"Never married."},
+      gift:{emoji:"🧩", val:"Invented calculus (mostly)", line:"Also secretly obsessed with alchemy."},
+      job:{emoji:"📐", val:"Mathematician & physicist", line:"Also Warden of the Royal Mint."},
+      animal:{emoji:"🐕", val:"A dog named Diamond", line:"Legend says it once knocked over his papers."},
+      home:{emoji:"🏰", val:"A stone manor house", line:"Its orchard supposedly inspired his most famous idea."} },
+    { name:{emoji:"🪶", val:"Marie Curie", line:"The only person to win Nobel Prizes in two sciences."},
+      nationality:{emoji:"🇵🇱", val:"Polish", line:"Later became a naturalized French citizen."},
+      birth:{emoji:"🕯️", val:"November 7, 1867 – July 4, 1934", line:"Cause: aplastic anemia, from radiation exposure · Age 66"},
+      wealth:{emoji:"🙂", val:"Modest, by choice", line:"Refused to patent her discoveries for profit."},
+      children:{emoji:"👧👦", val:"2 children", line:"Her daughter Irène later won a Nobel Prize too."},
+      gift:{emoji:"🧠", val:"Discovered radioactivity itself", line:"Carried glowing test tubes in her pockets."},
+      job:{emoji:"🔬", val:"Physicist & chemist", line:"First woman to win a Nobel Prize."},
+      animal:{emoji:"🐦", val:"No pet recorded", line:"Spent most of her hours in the lab instead."},
+      home:{emoji:"🏚️", val:"A modest city apartment", line:"Doubled as her first laboratory."} },
+    { name:{emoji:"🪶", val:"Leonardo da Vinci", line:"Wrote most of his notes in mirror script."},
+      nationality:{emoji:"🇮🇹", val:"Italian", line:"Born in a small Tuscan village."},
+      birth:{emoji:"🕯️", val:"April 15, 1452 – May 2, 1519", line:"Cause: likely a stroke · Age 67"},
+      wealth:{emoji:"🙂", val:"Supported by patrons", line:"Often paid in commissions, not coin."},
+      children:{emoji:"🚫", val:"No children", line:"Never married."},
+      gift:{emoji:"🎨", val:"A genius in nearly everything", line:"Painter, engineer, and anatomist, all at once."},
+      job:{emoji:"🎨", val:"Painter & inventor", line:"Left most of his projects unfinished."},
+      animal:{emoji:"🐎", val:"A deep love of horses", line:"Filled notebooks with studies of them."},
+      home:{emoji:"🏰", val:"A French manor house", line:"Spent his final years there, invited by a king."} },
+    { name:{emoji:"🪶", val:"Charles Darwin", line:"Spent 5 years sailing before writing a word of theory."},
+      nationality:{emoji:"🇬🇧", val:"British", line:"Rarely left his own garden after that voyage."},
+      birth:{emoji:"🕯️", val:"February 12, 1809 – April 19, 1882", line:"Cause: a heart condition · Age 73"},
+      wealth:{emoji:"💰", val:"Comfortably wealthy", line:"Family money meant he never needed to work for pay."},
+      children:{emoji:"👨‍👩‍👧‍👦", val:"10 children", line:"Three did not survive childhood."},
+      gift:{emoji:"👁️", val:"Saw patterns no one else noticed", line:"Took 20 years to publish his big idea."},
+      job:{emoji:"🔬", val:"Naturalist", line:"Spent years just studying barnacles."},
+      animal:{emoji:"🐦", val:"Countless finches and beetles", line:"His collection filled entire rooms."},
+      home:{emoji:"🏡", val:"A country house in England", line:"Rarely left it for the rest of his life."} },
+    { name:{emoji:"🪶", val:"Nikola Tesla", line:"Claimed to barely sleep more than two hours a night."},
+      nationality:{emoji:"🇷🇸", val:"Serbian", line:"Later became a naturalized American citizen."},
+      birth:{emoji:"🕯️", val:"July 10, 1856 – January 7, 1943", line:"Cause: heart failure, alone in a hotel room · Age 86"},
+      wealth:{emoji:"📉", val:"Died with almost nothing", line:"Gave away much of his patents' potential riches."},
+      children:{emoji:"🚫", val:"No children", line:"Never married."},
+      gift:{emoji:"⚡", val:"Envisioned wireless power for the world", line:"Decades ahead of the technology to build it."},
+      job:{emoji:"🔧", val:"Inventor & engineer", line:"Pioneered alternating current."},
+      animal:{emoji:"🐦", val:"A deep fondness for pigeons", line:"Fed them daily in his later years."},
+      home:{emoji:"🏨", val:"A New York hotel room", line:"Lived in hotels for the last decades of his life."} },
+    { name:{emoji:"🪶", val:"Ada Lovelace", line:"Wrote what's considered the first computer program — on paper."},
+      nationality:{emoji:"🇬🇧", val:"British", line:"Daughter of the poet Lord Byron."},
+      birth:{emoji:"🕯️", val:"December 10, 1815 – November 27, 1852", line:"Cause: uterine cancer · Age 36"},
+      wealth:{emoji:"💳", val:"Deep in gambling debts", line:"Lost a fortune betting on horses."},
+      children:{emoji:"👨‍👩‍👧‍👦", val:"3 children", line:"Raised while working through complex mathematics."},
+      gift:{emoji:"🧩", val:"Imagined computing before computers existed", line:"A century ahead of the machines she wrote for."},
+      job:{emoji:"📐", val:"Mathematician", line:"Worked closely with Charles Babbage."},
+      animal:{emoji:"🐎", val:"A passion for racehorses", line:"Which is partly what emptied her wallet."},
+      home:{emoji:"🏰", val:"A London townhouse", line:"Filled with mathematical notebooks."} },
+    { name:{emoji:"🪶", val:"Napoléon Bonaparte", line:"Crowned himself emperor, rather than wait for the Pope."},
+      nationality:{emoji:"🇫🇷", val:"French", line:"Born Corsican, became thoroughly French."},
+      birth:{emoji:"🕯️", val:"August 15, 1769 – May 5, 1821", line:"Cause: stomach cancer, in exile · Age 51"},
+      wealth:{emoji:"💰", val:"Once ruled half of Europe", line:"Died with very little, exiled on a remote island."},
+      children:{emoji:"👶", val:"1 acknowledged child", line:"Plus a couple of illegitimate ones, unspoken of at court."},
+      gift:{emoji:"🗣️", val:"An extraordinary military mind", line:"Could recall troop positions from memory alone."},
+      job:{emoji:"⚔️", val:"General, then Emperor", line:"Rewrote the legal code of an entire nation."},
+      animal:{emoji:"🐎", val:"A grey stallion named Marengo", line:"Carried him through most of his major battles."},
+      home:{emoji:"🏰", val:"A remote island house", line:"Damp, isolated, and heavily guarded."} },
+    { name:{emoji:"🪶", val:"Charles de Gaulle", line:"Refused to give up, even when France fell."},
+      nationality:{emoji:"🇫🇷", val:"French", line:"Led the country twice, decades apart."},
+      birth:{emoji:"🕯️", val:"November 22, 1890 – November 9, 1970", line:"Cause: a ruptured aneurysm · Age 79"},
+      wealth:{emoji:"🙂", val:"Comfortably modest", line:"Lived simply for a man who once ran a country."},
+      children:{emoji:"👨‍👩‍👧‍👦", val:"3 children", line:"His youngest daughter had Down syndrome, and he adored her."},
+      gift:{emoji:"🗣️", val:"A voice that rallied a nation by radio", line:"Broadcast his famous appeal from exile in London."},
+      job:{emoji:"⚔️", val:"General & statesman", line:"Founded a republic almost by force of will."},
+      animal:{emoji:"🐕", val:"A dog owner all his life", line:"Kept German Shepherds at his country home."},
+      home:{emoji:"🏡", val:"A country house in rural France", line:"Retired there twice, between periods in power."} },
+    { name:{emoji:"🪶", val:"Charlemagne", line:"Crowned Emperor on Christmas Day, allegedly by surprise."},
+      nationality:{emoji:"🇫🇷", val:"Frankish", line:"Ruled what is now France, Germany, and beyond."},
+      birth:{emoji:"🕯️", val:"April 2, 748 – January 28, 814", line:"Cause: pleurisy · Age 65"},
+      wealth:{emoji:"💰", val:"Ruler of a vast empire", line:"Controlled more territory than any king before him."},
+      children:{emoji:"👨‍👩‍👧‍👦", val:"18 children", line:"Across four wives and several other relationships."},
+      gift:{emoji:"🧠", val:"Could not write, but pushed learning everywhere", line:"Filled his court with scholars instead."},
+      job:{emoji:"👑", val:"King & Holy Roman Emperor", line:"United most of Western Europe under one crown."},
+      animal:{emoji:"🐘", val:"An elephant named Abul-Abbas", line:"A gift from a caliph, and quite the novelty at court."},
+      home:{emoji:"🏰", val:"An imperial palace", line:"Built to be the capital of his empire."} }
+  ];
+
   const deckOrder = [
     { key:"name",        label:"Name" },
     { key:"nationality", label:"Nationality" },
@@ -500,6 +630,7 @@
   let stream = null;
   let results = null;
   let currentCard = 0;
+  let forceLegendary = false;
 
   function mulberry32(a){
     return function(){
@@ -528,9 +659,19 @@
   }
 
   function buildResults(rng){
+    // Rare chance: land on a real historical figure instead of a random life
+    // (or a guaranteed one if the hidden clover was armed)
+    if(forceLegendary || rng() < legendaryChance){
+      forceLegendary = false;
+      return pick(rng, legendaryFigures);
+    }
+
+    // Nationality is drawn first so the name can match it
+    const nationality = pick(rng, nationalities);
+    const namePool = namesByNationality[nationality.val] || namesByNationality.American;
     const name = {
       emoji: "🪶",
-      val: `${pick(rng, firstNames)} ${pick(rng, lastNames)}`,
+      val: `${pick(rng, namePool.first)} ${pick(rng, namePool.last)}`,
       line: pick(rng, nameLines)
     };
 
@@ -539,12 +680,13 @@
     const birthMonth = randInt(rng, 0, 11);
     const birthDay = randInt(rng, 1, 28);
 
-    // age at death is capped so the death date never lands in the future
-    const maxAge = Math.max(1, PRESENT_YEAR - birthYear);
+    // age at death is capped so the death date never lands in the future,
+    // and floored at 18 so nobody dies as a child
+    const maxAge = Math.max(18, PRESENT_YEAR - birthYear);
     let band = pickAgeBand(rng);
     let age = randInt(rng, band.min, Math.min(band.max, maxAge));
     if(band.min > maxAge){
-      age = randInt(rng, 1, maxAge);
+      age = randInt(rng, 18, maxAge);
     }
     const deathYear = birthYear + age;
     const deathMonth = randInt(rng, 0, 11);
@@ -563,12 +705,15 @@
     else if(birthYear < 1990) jobPool = jobsByEra.midEra;
     else jobPool = jobsByEra.modernEra;
 
+    // Children stay coherent with age: too young to have raised any yet
+    const childrenPick = age < 25 ? children[0] : pick(rng, children);
+
     return {
       name,
-      nationality: pick(rng, nationalities),
+      nationality,
       birth,
       wealth: pick(rng, wealth),
-      children: pick(rng, children),
+      children: childrenPick,
       gift: pick(rng, gifts),
       job: pick(rng, jobPool),
       animal: pick(rng, animals),
@@ -667,6 +812,12 @@
 
   btnStart.addEventListener('click', runScanSequence);
 
+  const secretClover = document.getElementById('secretClover');
+  secretClover.addEventListener('dblclick', () => {
+    forceLegendary = true;
+    secretClover.classList.add('armed');
+  });
+
   function buildDeck(){
     deckList.innerHTML = "";
     finalWrap.innerHTML = "";
@@ -736,6 +887,7 @@
     document.getElementById('btnRestart').addEventListener('click', () => {
       showScreen(screenIntro);
       screenIntro.insertBefore(scanFrame, document.querySelector('#screen-intro .privacy-note'));
+      secretClover.classList.remove('armed');
       initCamera();
     });
   }
